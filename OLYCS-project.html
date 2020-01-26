@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+    
+    <p id="time" onclick="setFormat()"></p>
+    <p id="date"></p>
+    <p id="moonPhase"></p>
+    <button id="toggleFormat" class="timebutton" onclick="setFormat()">24-hr time</button>
+    <style>
+        .timebutton {
+          background-color: #1E90FF;
+          color: white;
+          padding: 12px;
+          font-size: 16px;
+          border: none;
+          cursor: pointer;
+        }
+
+        .timebutton:hover, .timebutton:focus {
+          background-color: #4169E1;
+        }
+    </style>
+    
+    <script>
+    // Get time and date
+        // set default to 12-hour format
+        var amPmFormat = true
+        
+        // toggle AM/PM format and change button text accordingly
+        timeButton = document.getElementById("toggleFormat")
+        function setFormat() {
+             if (amPmFormat) {
+                 amPmFormat = false
+                 timeButton.innerHTML = "12-hr time"
+             } else {
+                 amPmFormat = true
+                 timeButton.innerHTML = "24-hr time"
+             }
+         }
+        
+        function setTime() {
+            // create a date object and get the time and date of year
+            let date = new Date()
+            let seconds = date.getSeconds()
+            let minute = date.getMinutes()
+            let hour = date.getHours()
+            let day = date.getDate()
+            let month = date.getMonth()
+            // get month name
+            let months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+            let monthName = months[month]
+            let year = date.getFullYear()
+            // get day of week by name
+            let weekDays = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+            let dayOfWeek = weekDays[date.getDay()]
+            
+            // format for 24 hour time OR 12 hour time
+            function formatTime(hour12) {
+                if (minute < 10) {
+                    minute = "0" + String(minute)
+                }
+                if (seconds < 10) {
+                    seconds = "0" + String(seconds)
+                }
+                
+                // set time format using argument
+                var useMeridiem = hour12
+                
+                if (useMeridiem) {
+                    // if using am/pm format (stands for ante meridiem and post meridiem [latin] :-)
+                    if (hour > 12) {
+                        hour -= 12
+                        var amPm = "PM"
+                    } else {
+                        var amPm = "AM"
+                    }
+                    var timeParagraph = "<b>Time: </b>" + hour + ":" + minute + ":" + seconds + " " + amPm
+                    return timeParagraph
+                    
+                } else {
+                    // if using 'military time'
+                    var timeParagraph = "<b>Time: </b>" + hour + ":" + minute + ":" + seconds
+                    return timeParagraph
+                }
+            }
+            
+            
+            // TODO: - create slider to toggle between 'meridem time' and 'military time'
+            // show time (use true for 12-hour format and false for 24-hour format)
+            document.getElementById("time").innerHTML = formatTime(amPmFormat)
+            
+            // show day and date
+            var dateParagraph = "<b>Date: </b>" + dayOfWeek + ", " + monthName + " " + day + ", " + year
+            document.getElementById("date").innerHTML = dateParagraph
+            
+            var timeLoop = setTimeout(setTime, 100)
+        }
+    
+        setTime()
+        
+        
+    // Get the current moon phase using integer day, month and year
+        let moonDate = new Date()
+        let mDay = moonDate.getDate()
+        let mMonth = moonDate.getMonth()
+        let mYear = moonDate.getFullYear()
+        
+        function getMoonPhase(day, month, year) {
+            
+            var c = 0;
+            var e = 0;
+            var jd = 0;
+            var b = 0;
+            
+            if (month < 3) {
+                    year--;
+                    month += 12;
+                }
+            ++month;
+                c = 365.25 * year;
+                e = 30.6 * month;
+                jd = c + e + day - 694039.09; //jd is total days elapsed
+                jd /= 29.5305882; //divide by the moon cycle
+                b = parseInt(jd); //int(jd) -> b, take integer part of jd
+                jd -= b; //subtract integer part to leave fractional part of original jd
+                b = Math.round(jd * 8); //scale fraction from 0-8 and round
+            if (b >= 8 ) {
+                    b = 0; //0 and 8 are the same so turn 8 into 0
+                }
+            
+
+            let phases = ["New Moon", "Waxing Crescent Moon", "Quarter Moon", "Waxing Gibbous Moon", "Full Moon", "Waning Gibbous Moon", "Last Quarter Moon", "Waning Crescent Moon"]
+            
+            return phases[b];
+        }
+        
+        moonParagraph = "<b>Moon phase: </b>" + getMoonPhase(mDay, mMonth , mYear)
+        document.getElementById("moonPhase").innerHTML = moonParagraph;
+        
+    </script>
+</body>
+</html>
